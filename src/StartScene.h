@@ -24,6 +24,19 @@ private:
 	Label* m_pInstructionsLabel;*/
 
 	Ship* m_pShip;
+
+	// ----------- IMGUI ---------------
+	glm::vec2 m_mousePosition;
+
+	// ImGui utility functions
+	void m_ImGuiKeyMap();
+	void m_ImGuiSetStyle();
+	void m_updateUI();
+
+	// ImGui menu variables
+	bool m_exitApp = false;
+	bool m_displayAbout = false;
+	bool m_displayUI = true;
 };
 
 #endif /* defined (__START_SCENE__) */
