@@ -5,8 +5,9 @@
 #include <algorithm>
 #include "TileComparators.h"
 #include <iomanip>
+#include <string>
 
-StartScene::StartScene()
+StartScene::StartScene() : m_stormtroop(550, 500), m_stormtroop2(590, 500), m_stormtroop3(630, 500), m_stormtroop4(670, 500), m_stormtroop5(710, 500)
 {
 	StartScene::start();
 }
@@ -17,8 +18,19 @@ StartScene::~StartScene()
 
 void StartScene::draw()
 {
-	m_pShip->draw();
-
+	m_wookie.draw();
+	m_stormtroop.draw();
+	m_stormtroop2.draw();
+	m_stormtroop3.draw();
+	m_stormtroop4.draw();
+	m_stormtroop5.draw();
+	//m_platform.draw();
+	m_detonator->draw();
+	m_pLabels[0]->draw();
+	m_pLabels[1]->draw();
+	m_pLabels[2]->draw();
+	m_pLabels[3]->draw();
+	
 	// ImGui Rendering section - DO NOT MOVE OR DELETE
 	if (m_displayUI)
 	{
@@ -32,6 +44,30 @@ void StartScene::update()
 {
 	if (m_isGravityEnabled) {
 		m_move();
+		//SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(), 0x00, 0xFF, 0xFF, 0xFF);
+		//SDL_RenderDrawPoint(TheGame::Instance()->getRenderer(), (int)m_detonator->getPosition().x, (int)m_detonator->getPosition().y);
+		if (m_finalPosition.y > 510) {
+			m_isGravityEnabled = false;
+			glm::vec2 fPos = m_finalPosition - m_initialPos;
+			std::string hdisp = "H-Displacement = ";
+			hdisp += std::to_string(fPos.x);
+			hdisp += " m";
+			m_pLabels[3] = new Label(hdisp, "Consolas", 20, blue, glm::vec2(400.0f, 110.0f));
+		}
+		std::string text = "Initial Velocity(Vo) = ";
+		text += std::to_string(m_velocity);
+		text += " m/s";
+		m_pLabels[0] = new Label(text, "Consolas", 20, blue, glm::vec2(450.0f, 20.0f));
+
+		text = "X-Component(Vox) = ";
+		text += std::to_string(m_velocityX/m_PPM);
+		text += " m/s";
+		m_pLabels[1] = new Label(text, "Consolas", 16, blue, glm::vec2(400.0f, 50.0f));
+
+		text = "Y-Component(Voy) = ";
+		text += std::to_string(m_velocityY/m_PPM);
+		text += " m/s";
+		m_pLabels[2] = new Label(text, "Consolas", 16, blue, glm::vec2(400.0f, 80.0f));
 	}
 
 	if (m_displayUI)
@@ -45,7 +81,11 @@ void StartScene::clean()
 	/*delete m_pStartLabel;
 	delete m_pInstructionsLabel;*/
 
-	delete m_pShip;
+	// Delete all the label pointers
+	for (int i = 0; i < 10; i++)
+	{
+		delete m_pLabels[i];
+	}
 
 	removeAllChildren();
 }
@@ -166,9 +206,37 @@ void StartScene::start()
 	m_pInstructionsLabel->setParent(this);
 	addChild(m_pInstructionsLabel)*/
 
-	m_pShip = new Ship();
-	m_pShip->setPosition(glm::vec2(400.0f, 300.0f));
-	addChild(m_pShip);
+	// Initial Velocity 
+	m_pLabels[0] = new Label("Initial Velocity(Vo) = 100.0 m/s", "Consolas", 20, blue, glm::vec2(400.0f, 20.0f));
+	m_pLabels[0]->setParent(this);
+	addChild(m_pLabels[0]);
+
+	// Velocity X-component
+	m_pLabels[1] = new Label("X-Component(Vox) = (?)", "Consolas", 16, blue, glm::vec2(400.0f, 50.0f));
+	m_pLabels[1]->setParent(this);
+	addChild(m_pLabels[1]);
+
+	// Velocity Y-component
+	m_pLabels[2] = new Label("Y-Component(Voy) = (?)", "Consolas", 16, blue, glm::vec2(400.0f, 80.0f));
+	m_pLabels[2]->setParent(this);
+	addChild(m_pLabels[2]);
+
+	// Horizontal Displacement
+	m_pLabels[3] = new Label("H-Displacement = (?)", "Consolas", 20, blue, glm::vec2(400.0f, 110.0f));
+	m_pLabels[3]->setParent(this);
+	addChild(m_pLabels[3]);
+
+	m_detonator = new Detonator();
+	//m_detonator->setPosition(glm::vec2(50.0f, 500.0f));
+	addChild(m_detonator);
+	addChild(&m_wookie);
+	addChild(&m_stormtroop);
+	addChild(&m_stormtroop2);
+	addChild(&m_stormtroop3);
+	addChild(&m_stormtroop4);
+	addChild(&m_stormtroop5);
+
+	m_initialPos = m_detonator->getPosition();
 }
 
 // ImGui functions ***********************************************
@@ -297,9 +365,10 @@ void StartScene::m_updateUI()
 	}
 
 	/*************************************************************************************************/
-	if (ImGui::Button("Toggle Gravity"))
+	if (ImGui::Button("Fire!"))
 	{
 		m_isGravityEnabled = (m_isGravityEnabled) ? false : true;
+		m_detonator->draw();
 	}
 
 	ImGui::SameLine();
@@ -307,14 +376,28 @@ void StartScene::m_updateUI()
 	if (ImGui::Button("Reset All"))
 	{
 		m_isGravityEnabled = false;
-		m_pShip->setPosition(glm::vec2(400.0f, 300.0f));
+		m_detonator->setPosition(glm::vec2(50.0f, 500.0f));
 		m_gravity = 9.8f;
-		m_PPM = 5.0f;
+		m_PPM = 10.01f;
 		m_Atime = 0.016667f;
-		m_angle = 45.0f;
+		m_angle = 14.67f;
 		m_velocity = 100.0f;
 		m_velocityX = 0.0f;
 		m_velocityY = 0.0f;
+
+		for (int i = 0; i < 4; i++)
+		{
+			delete m_pLabels[i];
+		}
+		
+		// Initial Velocity 
+		m_pLabels[0] = new Label("Initial Velocity(Vo) = 100.0 m/s", "Consolas", 20, blue, glm::vec2(400.0f, 20.0f));
+		// Velocity X-component
+		m_pLabels[1] = new Label("X-Component(Vox) = (?)", "Consolas", 16, blue, glm::vec2(400.0f, 50.0f));
+		// Velocity Y-component
+		m_pLabels[2] = new Label("Y-Component(Voy) = (?)", "Consolas", 16, blue, glm::vec2(400.0f, 80.0f));
+		// Horizontal Displacement
+		m_pLabels[3] = new Label("H-Displacement = (?)", "Consolas", 20, blue, glm::vec2(400.0f, 110.0f));
 	}
 
 	ImGui::PushItemWidth(80);
@@ -559,11 +642,11 @@ void StartScene::m_move()
 	m_acceleration = glm::vec2(0.0f, m_gravity) * m_PPM;
 
 	// Physics equation
-	m_finalPosition = m_pShip->getPosition() 
+	m_finalPosition = m_detonator->getPosition() 
 		+ (velocity_vector * m_time)
 		+ ((m_acceleration * 0.5f) * (m_Atime * m_Atime));
 
 	m_Atime += m_time;
 
-	m_pShip->setPosition(m_finalPosition);
+	m_detonator->setPosition(m_finalPosition);
 }

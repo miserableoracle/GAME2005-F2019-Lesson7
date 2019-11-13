@@ -12,6 +12,8 @@ enum GameObjectType {
 	PLANET,
 	MINE,
 	TILE,
+	WEDGE,
+	BOX,
 	NUM_OF_TYPES
 };
 

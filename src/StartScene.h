@@ -5,6 +5,10 @@
 #include "Scene.h"
 #include "Label.h"
 #include "ship.h"
+#include "Wedge.h"
+#include "Wookie.h"
+#include "StormTrooper.h"
+#include "Detonator.h"
 #include <cmath>
 
 class StartScene : public Scene
@@ -25,9 +29,22 @@ private:
 	Label* m_pInstructionsLabel;*/
 
 	Ship* m_pShip;
+	Wedge m_platform;
+	Wookie m_wookie;
+	
+	StormTrooper m_stormtroop;
+	StormTrooper m_stormtroop2;
+	StormTrooper m_stormtroop3;
+	StormTrooper m_stormtroop4;
+	StormTrooper m_stormtroop5;
 
+	Detonator* m_detonator;
+	Label* m_pInstructionsLabel;
+	Label* m_pLabels[10];
 	// ----------- IMGUI ---------------
 	glm::vec2 m_mousePosition;
+	glm::vec2 m_initialPos;
+	SDL_Color blue = { 0, 0, 255, 255 };
 
 	// ImGui utility functions
 	void m_ImGuiKeyMap();
@@ -44,7 +61,7 @@ private:
 	const float Rad2Deg = 57.2957795130f;
 	bool m_isGravityEnabled = false;
 	float m_gravity = 9.8f;
-	float m_PPM = 5.0f;	// Pixels per meter - scale
+	float m_PPM = 10.01f;	// Pixels per meter - scale
 
 	glm::vec2 m_finalPosition = glm::vec2(0.0f, 0.0f);
 	float m_velocity = 100.0f;
@@ -55,7 +72,7 @@ private:
 	float m_time = 0.016667f;		// Approx. 16 ms
 	float m_Atime = 0.016667f;		// Accumulated time
 
-	float m_angle = 45.0f;	// The "kicking" Angle
+	float m_angle = 14.67f;	// The "kicking" Angle
 	// Physics Functions
 	void m_move();
 };	
